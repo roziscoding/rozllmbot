@@ -126,4 +126,26 @@ composer.on("chosen_inline_result", async (ctx, next) => {
   return next();
 });
 
+composer
+  .chatType("private")
+  .on("msg:text", async (ctx) => {
+    await ctx.replyWithChatAction("typing");
+
+    const response = await run(agent, ctx.msg.text)
+      .then((response) => response.finalOutput)
+      .catch((error) => `Error calling ChatGPT: ${error.message}`);
+
+    return ctx.reply(response ? response : "No response from the agent.", {
+      parse_mode: "HTML",
+      link_preview_options: {
+        is_disabled: true,
+      },
+    }).catch((err) => {
+      console.error("Error replying to message:", err);
+      return ctx.reply(
+        `An error occurred while processing your request: ${err.message}`,
+      );
+    });
+  });
+
 bot.use(composer);

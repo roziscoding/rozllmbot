@@ -1,15 +1,6 @@
 import { Agent, run, webSearchTool } from "@openai/agents";
 import { Bot, Composer } from "grammy";
-
-const TELETGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
-if (!TELETGRAM_BOT_TOKEN) {
-  throw new Error("TELEGRAM_BOT_TOKEN environment variable is not set.");
-}
-
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-if (!OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY environment variable is not set.");
-}
+import { config } from "./config.ts";
 
 const TELEGRAM_HTML_INSTRUCTIONS = `
 <b>bold</b>
@@ -50,7 +41,7 @@ const agent = new Agent({
   tools: [webSearchTool()],
 });
 
-export const bot = new Bot(TELETGRAM_BOT_TOKEN);
+export const bot = new Bot(config.telegram.token);
 const composer = new Composer().filter((ctx) => ctx.from?.id === 16715013);
 
 composer.on("inline_query", async (ctx, next) => {

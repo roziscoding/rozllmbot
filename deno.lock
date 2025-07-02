@@ -1,14 +1,11 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/dotenv@*": "0.225.4",
     "jsr:@std/path@1.0.9": "1.0.9",
-    "npm:@openai/agents@^0.0.10": "0.0.10"
+    "npm:@openai/agents@0.0.10": "0.0.10_zod@3.25.67",
+    "npm:zod@^3.25.67": "3.25.67"
   },
   "jsr": {
-    "@std/dotenv@0.225.4": {
-      "integrity": "2a672c2b192abe535dcfea1ae89f219ee3979af6aad7d185cb19206ee9bc5caf"
-    },
     "@std/path@1.0.9": {
       "integrity": "260a49f11edd3db93dd38350bf9cd1b4d1366afa98e81b86167b4e3dd750129e"
     }
@@ -70,7 +67,7 @@
         "openai@5.8.2_zod@3.25.67_ws@8.18.3"
       ]
     },
-    "@openai/agents-realtime@0.0.10_ws@8.18.3": {
+    "@openai/agents-realtime@0.0.10_zod@3.25.67_ws@8.18.3": {
       "integrity": "sha512-7ZgDWnVC3j9sk5vXv1xAwGHDW+v3p1Zh6kkpEdE+3ZIFVx+6xXHLa0DdOvxTQReEnfIekGpgTt4UT5XqEW9TWQ==",
       "dependencies": [
         "@openai/agents-core@0.0.10_zod@3.25.67_ws@8.18.3",
@@ -80,14 +77,14 @@
         "ws"
       ]
     },
-    "@openai/agents@0.0.10": {
+    "@openai/agents@0.0.10_zod@3.25.67": {
       "integrity": "sha512-HIjQQSaZRceSDnraZGIjAW9x3fH1peHUbtidvKsLCGZgdowhE5HKX4OCbc+SHG8H3ajH/3ZJ43bZ7lNWe5+pAw==",
       "dependencies": [
         "@openai/agents-core@0.0.10_zod@3.25.67",
         "@openai/agents-openai",
         "@openai/agents-realtime",
         "debug",
-        "openai@5.8.2_ws@8.18.3_zod@3.25.67"
+        "openai@5.8.2_zod@3.25.67_ws@8.18.3"
       ]
     },
     "@types/node@22.15.15": {
@@ -651,7 +648,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
-      "npm:@openai/agents@^0.0.10"
+      "npm:@openai/agents@0.0.10",
+      "npm:zod@^3.25.67"
     ]
   }
 }

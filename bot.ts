@@ -2,6 +2,8 @@ import { Agent, run, webSearchTool } from "@openai/agents";
 import { Bot, Composer } from "grammy";
 import { config } from "./config.ts";
 
+const ALLOWED_USERS = [16715013, 172933467];
+
 const TELEGRAM_HTML_INSTRUCTIONS = `
 <b>bold</b>
 <i>italic</i>
@@ -42,7 +44,7 @@ const agent = new Agent({
 });
 
 export const bot = new Bot(config.telegram.token);
-const composer = bot.filter((ctx) => ctx.from?.id === 16715013);
+const composer = bot.filter((ctx) => ALLOWED_USERS.includes(ctx.from?.id));
 
 composer.on("inline_query", async (ctx, next) => {
   if (!ctx.inlineQuery.query) return next();

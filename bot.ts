@@ -42,7 +42,7 @@ const agent = new Agent({
 });
 
 export const bot = new Bot(config.telegram.token);
-const composer = new Composer().filter((ctx) => ctx.from?.id === 16715013);
+const composer = bot.filter((ctx) => ctx.from?.id === 16715013);
 
 composer.on("inline_query", async (ctx, next) => {
   if (!ctx.inlineQuery.query) return next();

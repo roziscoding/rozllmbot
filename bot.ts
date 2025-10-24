@@ -27,6 +27,18 @@ Rules:
 - Use \\n to create new lines.
 `;
 
+function sanitizeTelegramHTML(text: string): string {
+  const allowedTags = ['b', 'i', 'u', 's', 'tg-spoiler', 'a', 'code', 'pre', 'blockquote'];
+
+  // Remove any opening or closing tags that are not in the allowed list
+  return text.replace(/<\/?([a-z][a-z0-9-]*)\b[^>]*>/gi, (match, tagName) => {
+    if (allowedTags.includes(tagName.toLowerCase())) {
+      return match;
+    }
+    return '';
+  });
+}
+
 const agentInstructionsLines = [
   "You are a helpful assistant being called by a user through an inline query in Telegram.",
   "When formatting your responses, use HTML formatting as described below:",
@@ -99,8 +111,10 @@ composer.on("chosen_inline_result", async (ctx, next) => {
     .then((response) => response.finalOutput)
     .catch((error) => `Error calling ChatGPT: ${error.message}`);
 
+  const sanitizedResponse = response ? sanitizeTelegramHTML(response) : null;
+
   await ctx.editMessageText(
-    response ? `${userMessage}\n\n${response}` : "No response from the agent.",
+    sanitizedResponse ? `${userMessage}\n\n${sanitizedResponse}` : "No response from the agent.",
     {
       parse_mode: "HTML",
       link_preview_options: {
@@ -110,8 +124,8 @@ composer.on("chosen_inline_result", async (ctx, next) => {
   )
     .catch(() => {
       return ctx.editMessageText(
-        response
-          ? `${userMessage}\n\n${response}`
+        sanitizedResponse
+          ? `${userMessage}\n\n${sanitizedResponse}`
           : "No response from the agent.",
       );
     })
@@ -137,7 +151,9 @@ composer
       .then((response) => response.finalOutput)
       .catch((error) => `Error calling ChatGPT: ${error.message}`);
 
-    return ctx.reply(response ? response : "No response from the agent.", {
+    const sanitizedResponse = response ? sanitizeTelegramHTML(response) : null;
+
+    return ctx.reply(sanitizedResponse ? sanitizedResponse : "No response from the agent.", {
       parse_mode: "HTML",
       link_preview_options: {
         is_disabled: true,

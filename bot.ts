@@ -186,6 +186,8 @@ composer
       },
     });
 
+    await ctx.replyWithChatAction("typing");
+
     const response = await run(agent, ctx.msg.text)
       .then((response) => response.finalOutput)
       .catch((error) => `Error calling ChatGPT: ${error.message}`);

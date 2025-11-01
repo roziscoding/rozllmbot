@@ -1,5 +1,5 @@
-import { Agent, run, webSearchTool } from "@openai/agents";
-import { Bot, Composer } from "grammy";
+import { Agent, run, webSearchTool, hostedMcpTool } from "@openai/agents";
+import { Bot  } from "grammy";
 import { config } from "./config.ts";
 
 const ALLOWED_USERS = [16715013, 172933467];
@@ -35,6 +35,11 @@ function sanitizeTelegramHTML(text: string): string {
     if (allowedTags.includes(tagName.toLowerCase())) {
       return match;
     }
+
+    if (tagName.toLowerCase() === 'br'){
+      return '\\n'
+    }
+
     return '';
   });
 }
@@ -52,11 +57,21 @@ const agentInstructionsLines = [
 const agent = new Agent({
   name: "LLM Bot",
   instructions: agentInstructionsLines.join("\n\n"),
-  tools: [webSearchTool()],
+  tools: [
+    webSearchTool(),
+    hostedMcpTool({
+      serverLabel: "telegram",
+      serverUrl: config.telegram.mcp.url,
+      headers: {
+        Authorization: config.telegram.mcp.authHeader,
+      },
+      allowedTools: config.telegram.mcp.allowedTools,
+    }),
+  ],
 });
 
 export const bot = new Bot(config.telegram.token);
-const composer = bot.filter((ctx) => ALLOWED_USERS.includes(ctx.from?.id));
+const composer = bot.filter((ctx) => ALLOWED_USERS.includes(ctx.from?.id ?? 0));
 
 composer.on("inline_query", async (ctx, next) => {
   if (!ctx.inlineQuery.query) return next();

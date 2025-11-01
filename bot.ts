@@ -23,7 +23,7 @@ Rules:
 - The API currently supports only the following named HTML entities: &lt;, &gt;, &amp; and &quot;.
 - Use nested pre and code tags, to define programming language for pre entity.
 - Programming language can't be specified for standalone code tags.
-- Use \\n to create new lines.
+- Use regular new lines to create new lines.
 `;
 
 function sanitizeTelegramHTML(text: string): string {

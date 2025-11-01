@@ -46,7 +46,7 @@ function sanitizeTelegramHTML(text: string): string {
     }
 
     if (tagName.toLowerCase() === "br") {
-      return "\\n";
+      return "\n";
     }
 
     return "";
@@ -177,8 +177,6 @@ composer.on("chosen_inline_result", async (ctx, next) => {
 composer
   .chatType("private")
   .on("msg:text", async (ctx) => {
-    await ctx.replyWithChatAction("typing");
-
     const message = await ctx.reply("Thinking...", {
       parse_mode: "HTML",
       link_preview_options: {

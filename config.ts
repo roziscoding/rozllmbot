@@ -16,7 +16,7 @@ const AppConfig = z.object({
       url: envs.TELEGRAM_MCP_URL,
       authHeader: envs.TELEGRAM_MCP_AUTH_HEADER,
       allowedTools: envs.TELEGRAM_MCP_ALLOWED_TOOLS,
-    }
+    },
   },
   openai: {
     apiKey: envs.OPENAI_API_KEY,

@@ -45,8 +45,8 @@ const consoleLogger = (
     msg?: string,
     ..._args: unknown[]
   ): string {
-    const timestamp = new Date().toISOString();
-    const levelUpper = level.toUpperCase().padEnd(5);
+    const timestamp = Date.now();
+    const levelValue = LOG_LEVELS[level];
 
     let message: string;
     let mergedBindings = { ...bindings };
@@ -59,11 +59,18 @@ const consoleLogger = (
       message = String(objOrMsg);
     }
 
-    const bindingsStr = Object.keys(mergedBindings).length > 0
-      ? ` ${JSON.stringify(mergedBindings)}`
-      : "";
+    // Build pino-compatible JSON log entry
+    const logEntry: Record<string, unknown> = {
+      level: levelValue,
+      time: timestamp,
+      ...mergedBindings,
+    };
 
-    return `[${timestamp}] ${levelUpper}:${bindingsStr} ${message}`;
+    if (message) {
+      logEntry.msg = message;
+    }
+
+    return JSON.stringify(logEntry);
   }
 
   function createLogMethod(

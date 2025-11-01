@@ -1,6 +1,7 @@
-import { Agent, run, webSearchTool, hostedMcpTool } from "@openai/agents";
-import { Bot  } from "grammy";
+import { Agent, hostedMcpTool, run, webSearchTool } from "@openai/agents";
+import { Bot, Context } from "grammy";
 import { config } from "./config.ts";
+import { hydrate, HydrateFlavor } from '@grammy/hydrate'
 
 const TELEGRAM_HTML_INSTRUCTIONS = `
 <b>bold</b>
@@ -26,7 +27,17 @@ Rules:
 `;
 
 function sanitizeTelegramHTML(text: string): string {
-  const allowedTags = ['b', 'i', 'u', 's', 'tg-spoiler', 'a', 'code', 'pre', 'blockquote'];
+  const allowedTags = [
+    "b",
+    "i",
+    "u",
+    "s",
+    "tg-spoiler",
+    "a",
+    "code",
+    "pre",
+    "blockquote",
+  ];
 
   // Remove any opening or closing tags that are not in the allowed list
   return text.replace(/<\/?([a-z][a-z0-9-]*)\b[^>]*>/gi, (match, tagName) => {
@@ -34,11 +45,11 @@ function sanitizeTelegramHTML(text: string): string {
       return match;
     }
 
-    if (tagName.toLowerCase() === 'br'){
-      return '\\n'
+    if (tagName.toLowerCase() === "br") {
+      return "\\n";
     }
 
-    return '';
+    return "";
   });
 }
 
@@ -68,8 +79,14 @@ const agent = new Agent({
   ],
 });
 
-export const bot = new Bot(config.telegram.token);
-const composer = bot.filter((ctx) => config.telegram.allowedUsers.includes(ctx.from?.id ?? 0));
+type MyContext = HydrateFlavor<Context>;
+
+export const bot = new Bot<MyContext>(config.telegram.token);
+bot.use(hydrate());
+
+const composer = bot.filter((ctx) =>
+  config.telegram.allowedUsers.includes(ctx.from?.id ?? 0)
+);
 
 composer.on("inline_query", async (ctx, next) => {
   if (!ctx.inlineQuery.query) return next();
@@ -127,7 +144,9 @@ composer.on("chosen_inline_result", async (ctx, next) => {
   const sanitizedResponse = response ? sanitizeTelegramHTML(response) : null;
 
   await ctx.editMessageText(
-    sanitizedResponse ? `${userMessage}\n\n${sanitizedResponse}` : "No response from the agent.",
+    sanitizedResponse
+      ? `${userMessage}\n\n${sanitizedResponse}`
+      : "No response from the agent.",
     {
       parse_mode: "HTML",
       link_preview_options: {
@@ -160,18 +179,28 @@ composer
   .on("msg:text", async (ctx) => {
     await ctx.replyWithChatAction("typing");
 
+    const message = await ctx.reply("Thinking...", {
+      parse_mode: "HTML",
+      link_preview_options: {
+        is_disabled: true,
+      },
+    });
+
     const response = await run(agent, ctx.msg.text)
       .then((response) => response.finalOutput)
       .catch((error) => `Error calling ChatGPT: ${error.message}`);
 
     const sanitizedResponse = response ? sanitizeTelegramHTML(response) : null;
 
-    return ctx.reply(sanitizedResponse ? sanitizedResponse : "No response from the agent.", {
-      parse_mode: "HTML",
-      link_preview_options: {
-        is_disabled: true,
+    return message.editText(
+      sanitizedResponse ? sanitizedResponse : "No response from the agent.",
+      {
+        parse_mode: "HTML",
+        link_preview_options: {
+          is_disabled: true,
+        },
       },
-    }).catch((err) => {
+    ).catch((err) => {
       console.error("Error replying to message:", err);
       return ctx.reply(
         `An error occurred while processing your request: ${err.message}`,

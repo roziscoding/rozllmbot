@@ -2,6 +2,7 @@ import { Api } from "grammy";
 import { config } from "../src/config.ts";
 import { confirmAction } from "./utils/confirm-action.ts";
 import { formatWebhookInfo } from "./utils/webhook-info.ts";
+import { logger } from "../src/logger.ts";
 
 const WEBHOOK_URL = Deno.args[0];
 
@@ -21,5 +22,5 @@ await api.setWebhook(Deno.args[0], {
 });
 
 const webhookInfo = await api.getWebhookInfo();
-console.log(`Webhook info for ${me.username}:`);
-console.log(formatWebhookInfo(webhookInfo));
+logger.info(`Webhook info for ${me.username}:`);
+logger.info(formatWebhookInfo(webhookInfo));

@@ -1,5 +1,6 @@
 import { webhookCallback } from "grammy";
 import { bot } from "./src/bot.ts";
+import { logger } from "./src/logger.ts";
 
 const TELETGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
 if (!TELETGRAM_BOT_TOKEN) {
@@ -12,7 +13,7 @@ const handleUpdate = webhookCallback(bot, "std/http", {
 
 Deno.serve({
   onListen: ({ port }) => {
-    console.log(`Listening on port ${port}`);
+    logger.info(`Listening on port ${port}`);
   },
 }, async (req) => {
   if (req.method === "POST") {

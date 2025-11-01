@@ -1,9 +1,8 @@
-import { run } from "@openai/agents";
 import { Composer } from "grammy";
-import { agent } from "../agent/index.ts";
-import { sanitizeTelegramHTML } from "../utils/telegram-html.ts";
+import { BotContext } from "../contex.ts";
+import { QueueMessage } from "./queue.ts";
 
-export const inlineQueryHandler = new Composer();
+export const inlineQueryHandler = new Composer<BotContext>();
 
 inlineQueryHandler
   .on("inline_query", async (ctx, next) => {
@@ -55,39 +54,15 @@ inlineQueryHandler.on("chosen_inline_result", async (ctx, next) => {
     },
   );
 
-  const response = await run(agent, ctx.chosenInlineResult.query)
-    .then((response) => response.finalOutput)
-    .catch((error) => `Error calling ChatGPT: ${error.message}`);
-
-  const sanitizedResponse = response ? sanitizeTelegramHTML(response) : null;
-
-  await ctx.editMessageText(
-    sanitizedResponse
-      ? `${userMessage}\n\n${sanitizedResponse}`
-      : "No response from the agent.",
+  await ctx.kv.enqueue(
     {
-      parse_mode: "HTML",
-      link_preview_options: {
-        is_disabled: true,
-      },
-    },
-  )
-    .catch(() => {
-      return ctx.editMessageText(
-        sanitizedResponse
-          ? `${userMessage}\n\n${sanitizedResponse}`
-          : "No response from the agent.",
-      );
-    })
-    .catch((err) => {
-      console.error("Error editing message:", err);
-      return ctx.editMessageText(
-        `An error occurred while processing your request: ${err.message}`,
-      );
-    })
-    .catch((err) => {
-      console.error("Error editing message:", err);
-    });
+      type: "inlineQuery",
+      updateId: ctx.update.update_id,
+      inlineMessageId: ctx.chosenInlineResult.inline_message_id,
+      input: ctx.chosenInlineResult.query,
+      from: ctx.from,
+    } satisfies QueueMessage,
+  );
 
   return next();
 });

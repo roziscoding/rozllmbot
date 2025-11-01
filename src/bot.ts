@@ -18,7 +18,7 @@ bot.use((ctx, next) => {
       writable: false,
     },
     logger: {
-      value: logger,
+      value: logger.child({ updateId: ctx.update.update_id, from: ctx.from }),
       enumerable: true,
       writable: false,
     },
@@ -28,15 +28,15 @@ bot.use((ctx, next) => {
 });
 
 bot.use((ctx, next) => {
-  logger.info(
-    `Processing update ${ctx.update.update_id} from ${ctx.from?.first_name}`,
+  ctx.logger.info(
+    `Processing update from ${ctx.from?.first_name}`,
   );
   return next();
 });
 
-bot.filter(isAllowedUser);
+const composer = bot.filter(isAllowedUser);
 
-bot.use(inlineQueryHandler);
-bot.use(messageHandler);
+composer.use(inlineQueryHandler);
+composer.use(messageHandler);
 
 registerQueueHandlers(kv, bot.api);

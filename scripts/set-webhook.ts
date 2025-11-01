@@ -1,6 +1,7 @@
 import { Api } from "grammy";
-import { config } from "../config.ts";
+import { config } from "../src/config.ts";
 import { confirmAction } from "./utils/confirm-action.ts";
+import { formatWebhookInfo } from "./utils/webhook-info.ts";
 
 const WEBHOOK_URL = Deno.args[0];
 
@@ -21,9 +22,4 @@ await api.setWebhook(Deno.args[0], {
 
 const webhookInfo = await api.getWebhookInfo();
 console.log(`Webhook info for ${me.username}:`);
-console.log(`- URL: ${webhookInfo.url}`);
-console.log(`- Allowed updates: ${webhookInfo.allowed_updates || "Not set"}`);
-console.log(`- Max connections: ${webhookInfo.max_connections || "Not set"}`);
-console.log(`- Pending updates: ${webhookInfo.pending_update_count || "Not set"}`);
-console.log(`- Last error date: ${webhookInfo.last_error_date || "Not set"}`);
-console.log(`- Last error message: ${webhookInfo.last_error_message || "Not set"}`);
+console.log(formatWebhookInfo(webhookInfo));

@@ -625,7 +625,8 @@
   },
   "redirects": {
     "https://lib.deno.dev/x/grammy@v1/mod.ts": "https://deno.land/x/grammy@v1.38.3/mod.ts",
-    "https://lib.deno.dev/x/grammy@v1/types.ts": "https://deno.land/x/grammy@v1.38.3/types.ts"
+    "https://lib.deno.dev/x/grammy@v1/types.ts": "https://deno.land/x/grammy@v1.38.3/types.ts",
+    "https://lib.deno.dev/x/grammy_hydrate@v1/mod.ts": "https://deno.land/x/grammy_hydrate@v1.6.0/mod.ts"
   },
   "remote": {
     "https://cdn.skypack.dev/-/debug@v4.4.3-Brh22weuCvWY3rcSd25Q/dist=es2019,mode=imports/optimized/debug.js": "931098fa073c5244168f500d7eecf16557a6ff58fdefe079384f427b8d0ac915",

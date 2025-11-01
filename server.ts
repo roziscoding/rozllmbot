@@ -1,5 +1,5 @@
 import { webhookCallback } from "grammy";
-import { bot } from "./bot.ts";
+import { bot } from "./src/bot.ts";
 
 const TELETGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
 if (!TELETGRAM_BOT_TOKEN) {

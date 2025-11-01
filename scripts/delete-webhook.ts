@@ -1,5 +1,5 @@
 import { Api } from "grammy";
-import { config } from "../config.ts";
+import { config } from "../src/config.ts";
 import { confirmAction } from "./utils/confirm-action.ts";
 
 const api = new Api(config.telegram.token);
